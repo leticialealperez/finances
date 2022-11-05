@@ -9,14 +9,16 @@ interface AppAlertProps{
     type: 'error' | 'info' | 'success' | 'warning',
     message: string,
     show?: boolean,
-    setShow: React.Dispatch<React.SetStateAction<boolean>>;
+    setShow?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 // ALERTA CRIADO PARA USO NO APP
 const AppAlert = ({ type, message, show, setShow }: AppAlertProps) => {
 
   const handleClose = () => {
-    setShow(false)
+    if(setShow){
+      setShow(false)
+    }
   }
 
   return (

@@ -67,7 +67,7 @@ const DataTable: React.FC<TableProps> = ({ title, data }) => {
   const [selected, setSelected] = React.useState<readonly string[]>([]);
   const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(false);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [rows, setRows] = useState<IData[]>([]);
 
   useEffect(() => {
@@ -116,11 +116,6 @@ const DataTable: React.FC<TableProps> = ({ title, data }) => {
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
   };
 
   const isSelected = (name: string) => selected.indexOf(name) !== -1;
@@ -197,13 +192,11 @@ const DataTable: React.FC<TableProps> = ({ title, data }) => {
           </Table>
         </TableContainer>
         <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
           component="div"
           count={rows.length}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </Paper>
     </Box>

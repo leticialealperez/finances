@@ -1,11 +1,10 @@
 import { combineReducers } from 'redux';
+import incomeIn from './income-in/incomeInSlice';
+import incomeOut from './income-out/incomeOutSlice';
 
-import incomeIn from './income-in/reducer';
-import incomeOut from './income-out/reducer';
-import showAlert from './alert/reducer';
-
-export default combineReducers({
+const rootReducer = combineReducers({
   incomeIn,
   incomeOut,
-  showAlert,
 });
+
+export { rootReducer }

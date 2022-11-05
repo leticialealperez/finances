@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { v4 as uuidv4 } from 'uuid';
 
 import {
   Grid, Typography, IconButton, Card, Toolbar,
@@ -10,64 +11,85 @@ import { ArrowBack } from '@mui/icons-material';
 
 import { useStyles } from './styles';
 import { AppAlert } from '../../components/Alert/Alert';
+import { useAppDispatch } from '../../store/modules/hooks';
+import { addIncomeIn } from '../../store/modules/income-in/incomeInSlice';
+import { addIncomeOut } from '../../store/modules/income-out/incomeOutSlice';
 
-type Type = 'Entrada' | 'Saída' | '';
-type Key = 'description' | 'value';
+type TypeIncome = 'Entrada' | 'Saída' | '';
+type Key = 'description' | 'value' | 'type';
+
+export interface Income {
+    uid: string,
+    description: string;
+    value: string;
+    type: TypeIncome;
+}
+
+export type Incomes = Income[]
 
 const Register: React.FC = () => {
     const theme = useTheme();
     const classes = useStyles(theme);
-
-    const [type, setType] = useState<Type>('');
     const [description, setDescription] = useState('');
     const [value, setValue] = useState('');
-    const [isFormInvalid, setIsFormInvalid] = useState(true);
-    const [showAlert, setShowAlert] = useState(false);
+    const [type, setType] = useState<TypeIncome>('');
+    const [isFormValid, setIsFormValid] = useState(false);
+
+    const dispatch = useAppDispatch();
+    // SET => dispatch(intensao) => reducer
 
     useEffect(() => {
-        if(!description || !value || !type) {
-            setIsFormInvalid(true)
-        } else {
-            setIsFormInvalid(false)
+        if(description && value && type){ 
+            setIsFormValid(true)  
+        }else {
+           setIsFormValid(false)
         }
-    }, [type, description, value])
 
-    const handleChangeSelect = (value: Type) => {
-        setType(value);
-    };
+    }, [description, value, type])
+
 
     const handleChangeInput = (value: string, key: Key) => {
         switch(key){
             case 'description':
-                setDescription(value);
+                setDescription(value)
             break;
 
-            case 'value':
-                setValue(value);
+            case 'value': 
+                setValue(value)
             break;
 
             default:
-            break;
         }
     };
 
-    const handleReset = () => {
-        setType('');
-        setDescription('');
-        setValue('');
-    };
+    const handleChangeTypeIncome = (value: TypeIncome) => {
+        setType(value)
+    }
 
     const handleSubmit = () => {
-        console.log({
-            uid: '1234',
-            description,
-            value,
-            type
-        });
+        const income = {
+            uid: uuidv4(),
+            description: description,
+            value: value,
+            type: type,
+        }
 
-        handleReset();
-        setShowAlert(true);
+        if(income.type === 'Entrada'){
+            dispatch(addIncomeIn(income))
+        }
+
+        if(income.type === 'Saída'){
+            dispatch(addIncomeOut(income))
+        }
+
+        handleClear();
     };
+
+    const handleClear = () => {
+        setDescription('');
+        setValue('');
+        setType('');
+    }
 
     return (
         <Grid item>
@@ -82,7 +104,7 @@ const Register: React.FC = () => {
                 </Typography>
             </Toolbar>
 
-           <AppAlert type="success" message='Cadastrado com sucesso!' show={showAlert} setShow={setShowAlert}/>
+           <AppAlert type="success" message='Cadastrado com sucesso!' />
 
             <Grid container spacing={3} alignItems='center' justifyContent='center'>
                 <Grid item xs={12}>
@@ -104,10 +126,10 @@ const Register: React.FC = () => {
                                 <FormControl variant="outlined" fullWidth>
                                     <InputLabel id="demo-simple-select-outlined-label">Tipo</InputLabel>
                                     <Select
+                                        value={type}
                                         labelId="demo-simple-select-outlined-label"
                                         id="demo-simple-select-outlined"
-                                        value={type}
-                                        onChange={(ev) => handleChangeSelect(ev.target.value as Type)}
+                                        onChange={(ev) => handleChangeTypeIncome(ev.target.value as TypeIncome)}
                                         label='Tipo'
                                     >
                                         <MenuItem value='Entrada'>Entrada</MenuItem>
@@ -119,12 +141,12 @@ const Register: React.FC = () => {
 
                         <CardActions sx={classes.actions}>
                             <Box alignSelf="flex-start">
-                                <Button variant="outlined" onClick={handleReset} color="secondary">
+                                <Button variant="outlined" onClick={handleClear} color="secondary">
                                     limpar
                                 </Button>
                             </Box>
                             <Box alignSelf="flex-end">
-                                <Button variant="contained" onClick={handleSubmit} color="secondary" disabled={isFormInvalid}>
+                                <Button variant="contained" onClick={handleSubmit} color="secondary" disabled={!isFormValid}>
                                     cadastrar
                                 </Button>
                             </Box>
